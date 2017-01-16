@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<config>
+  <modules>
+    <Datalay_FindifyFeed>
+      <active>true</active>
+      <codePool>community</codePool>
+      <version>1.0.0</version>
+    </Datalay_FindifyFeed>
+  </modules>
+</config>

@@ -1,0 +1,144 @@
+<?xml version="1.0"?>
+<config>
+	<tabs>
+		<findify translate="label" module="findifyfeed">
+			<label>Findify</label>
+			<sort_order>1000</sort_order>
+	        </findify>
+	</tabs>
+	<sections>
+		<attributes  translate="label" module="findifyfeed">                    
+			<label>Feed Configuration</label>
+			<tab>findify</tab>
+			<frontend_type>text</frontend_type>
+			<sort_order>10</sort_order>
+			<show_in_default>1</show_in_default>
+			<show_in_website>1</show_in_website>
+			<show_in_store>1</show_in_store>            
+			<groups>
+				<schedule translate="label"> 
+					<label>Feed Schedule</label>
+					<frontend_type>text</frontend_type>
+					<sort_order>10</sort_order>
+					<show_in_default>1</show_in_default>
+					<show_in_website>1</show_in_website>
+					<show_in_store>1</show_in_store>
+				       	<fields>
+						<isenabled translate="label">
+							<label>Enabled</label> 
+							<frontend_type>select</frontend_type>
+							<source_model>adminhtml/system_config_source_yesno</source_model>
+							<sort_order>10</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+        			                </isenabled>
+		                                <cronhour translate="label">
+                		                	<label>Cron hours:</label>
+                              				<frontend_type>text</frontend_type>
+                              				<comment>If set to "3", the feed will be generated at 3am. If set to "3,11,19" will generate the feed at 3am, 11am and 7pm. No spaces should be inserted between values. If empty of wrong value, hour will be set as "1"</comment>
+                                                    	<backend_model>findifyfeed/adminhtml_system_config_backend_findifymodel_cron</backend_model>
+							<sort_order>20</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>0</show_in_website>
+							<show_in_store>0</show_in_store>
+							<depends>
+                                                        	<isenabled>1</isenabled>
+                                                    	</depends>
+						</cronhour>
+		                                <cronminutes translate="label">
+                		                	<label>Cron minutes:</label>
+                              				<frontend_type>text</frontend_type>
+                              				<comment>Same format as hours field. If empty of wrong value, minutes will be set as "30"</comment>
+                                                    	<backend_model>findifyfeed/adminhtml_system_config_backend_findifymodel_cron</backend_model>
+                                                    	<sort_order>30</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>0</show_in_website>
+							<show_in_store>0</show_in_store>
+							<depends>
+                                                        	<isenabled>1</isenabled>
+							</depends>
+						</cronminutes>
+		                                <isrunning translate="label">
+                		                	<label>Feed generation running now</label>
+                                                        <frontend_type>label</frontend_type>   
+							<frontend_model>findifyfeed/adminhtml_feedisrunning</frontend_model>
+							<sort_order>50</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>0</show_in_website>
+							<show_in_store>0</show_in_store>
+						</isrunning>
+		                                <generatenow translate="label">
+                		                	<label>Synchonize now</label>
+							<frontend_type>button</frontend_type>
+							<frontend_model>findifyfeed/generatenow</frontend_model>
+							<sort_order>100</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>0</show_in_website>
+							<show_in_store>0</show_in_store>
+						</generatenow>
+					</fields>
+				</schedule>
+				<general translate="label"> 
+					<label>Feed Attributes</label>
+					<frontend_type>text</frontend_type>
+					<sort_order>20</sort_order>
+					<show_in_default>1</show_in_default>
+					<show_in_website>1</show_in_website>
+					<show_in_store>1</show_in_store>
+					<comment><![CDATA[Choose here the extra attributes that you would like to make searchable or create filters from. The order does not matter. The left column correspond to the label of your attribute. The right column needs to be set to a lowercased name that will be present in the feed]]></comment>
+				       	<fields>
+						<attributes translate="label">
+							<label>Feed Attributes</label>
+							<frontend_model>findifyfeed/config_selectAttributes</frontend_model>
+							<backend_model>adminhtml/system_config_backend_serialized_array</backend_model>
+							<sort_order>10</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</attributes>
+					</fields>
+				</general>
+				<feedinfo translate="label">
+					<label>Feed Info</label>
+					<frontend_type>text</frontend_type>
+					<sort_order>30</sort_order>
+					<show_in_default>1</show_in_default>
+					<show_in_website>1</show_in_website>
+					<show_in_store>1</show_in_store>
+					<!-- <comment><![CDATA[To view feed URL please <strong>select a store view</strong> in Current Configuration Scope]]></comment>-->
+				       	<fields>
+		                                <feedfilename translate="label">
+                		                	<label>Feed name:</label>
+                              				<frontend_type>text</frontend_type>
+                              				<comment>If empty, jsonl_feed-storecode will be used by default. Ex: jsonl_feed-french</comment>
+							<sort_order>20</sort_order>
+							<show_in_default>0</show_in_default>
+							<show_in_website>0</show_in_website>
+							<show_in_store>1</show_in_store>
+						</feedfilename>
+		                                <feedurl translate="label">
+                		                	<label>Product feed URL:</label>
+                              				<frontend_type>label</frontend_type>
+							<frontend_model>findifyfeed/adminhtml_feedurl</frontend_model>
+							<comment><![CDATA[<strong>Findify needs this URL to synchronize your products</strong>]]></comment>
+							<sort_order>30</sort_order>
+							<show_in_default>0</show_in_default>
+							<show_in_website>0</show_in_website>
+							<show_in_store>1</show_in_store>
+						</feedurl>
+		                                <feedlastgenerated translate="label">
+                		                	<label>Last updated at:</label>
+                              				<frontend_type>label</frontend_type>
+							<frontend_model>findifyfeed/adminhtml_feeddate</frontend_model>
+							<sort_order>40</sort_order>
+							<show_in_default>0</show_in_default>
+							<show_in_website>0</show_in_website>
+							<show_in_store>1</show_in_store>
+						</feedlastgenerated>
+					</fields>
+				</feedinfo>
+			</groups>
+		</attributes>
+	</sections>
+</config>
