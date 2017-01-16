@@ -9,8 +9,10 @@ SQLTEXT;
 
 //$installer->run($sql);
 
-//demo 
 //Mage::getModel('core/url_rewrite')->setId(null);
-//demo 
+
+//$io = new Varien_Io_File();
+//$io->checkAndCreateFolder(Mage::getBaseDir('media').DS.'findify');
+
 $installer->endSetup();
 	 
