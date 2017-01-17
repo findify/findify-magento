@@ -8,6 +8,8 @@ The main features of this extension are:
 - Schedule the generation of the feeds
 - Configure the attributes of the feeds
 
+Magento compatible versions: 1.5, 1.6, 1.6.1, 1.6.2.0, 1.7, 1.8, 1.8.1, 1.9, 1.9.1, 1.9.2
+
 ## How to install the extension?
 
 Unless you have enabled the Magento compiler, you will need to:
