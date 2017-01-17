@@ -44,15 +44,21 @@ For both fields, you have the possibility to define:
 ### Generate the feed now
 In order to run the product feed generation now, click on the button "Run now".
 
+![feed_schedule](doc/feed_schedule.png)
+
 ## Feed Attributes
 To add a new field to the feed you just need to:
 - Choose the Magento attribute thanks to the drop-down on the left of the table.
 - Assign a name to this attribute on the right. 
+
+![feed_attributes](doc/feed_attributes.png)
 
 ## Feed Information
 Each view contains:
 - A field to define the feed name. By default, a value is provided.
 - The product feed URL that you will have to give to Findify.
 - The last generation time of the feed.
+
+![feed_info](doc/feed_info.png)
 
 
