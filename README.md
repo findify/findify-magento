@@ -12,7 +12,7 @@ The main features of this extension are:
 
 Unless you have enabled the Magento compiler, you will need to:
 
-* Download the compressed zip file containing the extension from Github.
+* Download the compressed [ZIP file](https://github.com/findify/findify-magento/archive/master.zip "ZIP") containing the extension from Github.
 * Unzip it at the root of the Magento folder.
 * Make sure that the webserver is allowed to write in the folder "/media/findify" so the extension can generate feeds there.
 * Flush the Magento cache to reload the XML configuration files
