@@ -2,7 +2,7 @@
 <config>
     <modules>
         <Datalay_FindifyFeed>
-            <version>1.0.0</version>
+            <version>1.0.1</version>
         </Datalay_FindifyFeed>
     </modules>
     <global>
@@ -19,18 +19,18 @@
         <models>
             <findifyfeed>
                 <class>Datalay_FindifyFeed_Model</class>
-                <resourceModel>findifyfeed_mysql4</resourceModel>
+                <!-- <resourceModel>findifyfeed_mysql4</resourceModel> -->
             </findifyfeed>
-            <findifyfeed_mysql4>
+            <!-- <findifyfeed_mysql4>
                 <class>Datalay_FindifyFeed_Model_Mysql4</class>
                 <entities>
                     <findifymodel>
                         <table>findifyfeed</table>
                     </findifymodel>
                 </entities>
-            </findifyfeed_mysql4>
+            </findifyfeed_mysql4> -->
         </models>
-        <events>
+        <!-- <events>
             <findifyfeed_notifications_before>
                 <observers>
                     <findifyfeed_observer>
@@ -40,7 +40,7 @@
                     </findifyfeed_observer>
                 </observers>
             </findifyfeed_notifications_before>
-        </events>
+        </events> -->
         <resources>
             <findifyfeed_setup>
                 <setup>
@@ -80,7 +80,7 @@
             </adminhtml>
         </routers>
     </admin>
-    <adminhtml>
+    <!-- <adminhtml>
         <layout>
                 <updates>
                         <findifyfeed>
@@ -88,7 +88,7 @@
                         </findifyfeed>
                 </updates>
         </layout>
-    </adminhtml>
+    </adminhtml> -->
     <!-- <default>
     	<attributes>
             <general>
