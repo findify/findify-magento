@@ -6,8 +6,19 @@ class Datalay_FindifyFeed_Model_Cron{
 	Mage::log('Findify: starting cron task');
 
         $mediapath = Mage::getBaseDir('media');
+        $urlmediapath = Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_MEDIA);
+        $magentoversion = Mage::getVersion();
+        $extensionversion = (string)Mage::getConfig()->getNode()->modules->Datalay_FindifyFeed->version;
 
-	foreach (Mage::app()->getWebsites() as $website) {
+	$fileextradata = $mediapath.'/findify/feedextradata.gz';
+        $jsonextradata = array();
+	$extradata = array(
+	    'extension_version' => $extensionversion,
+	    'magento_version' => $magentoversion,
+	    'feeds' => array()
+	);
+
+        foreach (Mage::app()->getWebsites() as $website) {
 
 	    foreach ($website->getGroups() as $group) {
 
@@ -39,7 +50,8 @@ class Datalay_FindifyFeed_Model_Cron{
 			}
 		        $file = $mediapath.'/findify/'.$filename.'.gz';
 
-			$today = time(); // time() evaluation should go in the main loop if a feed generation task could last more than one day (i.e: 1 hour task starting at 23:30)
+                        $starttime = new DateTime('NOW');
+			$today = time(); // time() evaluation should go in the product main loop if a feed generation task could last more than one day (i.e: 1 hour task starting at 23:30)
 			$jsondata = array();
 		
 			// Basic attributes which will always be needed for feed generation:
@@ -59,6 +71,7 @@ class Datalay_FindifyFeed_Model_Cron{
 
                         // load product collection, selecting only needed attributes
 			$products = Mage::getResourceModel('catalog/product_collection')
+			    ->addAttributeToFilter('status',array('eq' => Mage_Catalog_Model_Product_Status::STATUS_ENABLED))
 			    ->addAttributeToSelect($attributesUsed);
 			    //->addAttributeToFilter('sku', array('like' => 'm%'))
 
@@ -92,12 +105,6 @@ class Datalay_FindifyFeed_Model_Cron{
                             }
                             $product_data['created_at'] = $datetime->format(DateTime::ATOM);
                         
-                            // set item_group_id
-                            // TEMP
-                            //$parentId = '';
-                            //if ($parentId) {
-                            //    $product_data['item_group_id'] = $parentId; // if product has a parent, set parent id as item_group_id
-                            //} else
                             if ($product_data['type_id'] == "configurable" || $product_data['type_id'] == "grouped") { // if this product has children, set id as item_group_id
                                 $product_data['item_group_id'] = $product_data['id'];            
                             }else{
@@ -164,20 +171,56 @@ class Datalay_FindifyFeed_Model_Cron{
                                 }
                             }
                                 
-                            if($product->getTypeId() != "simple"){ // if product is not simple, it can not have parents
-                                $jsondata[] = json_encode($product_data)."\n"; // Add this product data to main json array
-                            }else{ // if product is simple, it can belong to a grouped or configurable product
-                                $parentIds = Mage::getModel('catalog/product_type_grouped')->getParentIdsByChild($product->getId()); // does it belong to a grouped product?
-                                if(!$parentIds) {
-                                    $parentIds = Mage::getModel('catalog/product_type_configurable')->getParentIdsByChild($product->getId()); // does it belong to a configurable product?
-                                }
-                                if(isset($parentIds[0])){ // product is simple and has parents
-                                    foreach($parentIds as $parentId) {
-                                        $product_data['item_group_id'] = $parentId; // child products are added once for each parent, setting item_group_id with the parents' ids
-                                        $jsondata[] = json_encode($product_data)."\n"; // Add this product data to main json array
+                            $jsondata[] = json_encode($product_data)."\n"; // Add this product data to main json array
+
+                            if($product->getTypeId() == "simple"){ // if product is not simple, it can not have parents
+
+                                $groupParentsIds = Mage::getModel('catalog/product_type_grouped')->getParentIdsByChild($product->getId()); // does it belong to a grouped product?
+                                if(isset($groupParentsIds[0])){ // it belongs to at least one grouped product
+                                    foreach($groupParentsIds as $parentId) {
+                                        $product_data_in_group = $product_data; // we add to the feed a copy of the simple product for each group that it belongs to, modifying item_group_id in each instance
+                                        $product_data_in_group['item_group_id'] = $parentId;
+                                        $jsondata[] = json_encode($product_data_in_group)."\n";
                                     }
-                                }else{ // product is simple and has no parents
-                                    $jsondata[] = json_encode($product_data)."\n"; // Add this product data to main json array
+                                }
+                                
+                                $configurableParentsIds = Mage::getModel('catalog/product_type_configurable')->getParentIdsByChild($product->getId()); // does it belong to a configurable product?
+                                if(isset($configurableParentsIds[0])){ // it belongs to at least one configurable product
+                                    foreach($configurableParentsIds as $parentId) {
+                                        $product_data_in_configurable = $product_data; // we add to the feed a copy of the simple product for each configurable that it belongs to, modifying item_group_id in each instance
+                                        $product_data_in_configurable['item_group_id'] = $parentId; // child products are added once for each parent, setting item_group_id with the parents' ids
+
+					// now we will calculate the product's price as part of its configurable parent
+                                        $configurableProduct = Mage::getModel('catalog/product')->load($parentId); 
+                                        $attributes = $configurableProduct->getTypeInstance(true)->getConfigurableAttributes($configurableProduct);
+                                        $pricesByAttributeValues = array();
+                                        $basePrice = $configurableProduct->getFinalPrice(); // configurable product base price
+                                        foreach ($attributes as $attribute){ // check all attributes and get the price adjustments specified in the configurable product admin page
+                                            $prices = $attribute->getPrices();
+                                            foreach ($prices as $price){
+                                                if ($price['is_percent']){
+                                                    $pricesByAttributeValues[$price['value_index']] = (float)$price['pricing_value'] * $basePrice / 100;
+                                                }
+                                                else {
+                                                    $pricesByAttributeValues[$price['value_index']] = (float)$price['pricing_value'];
+                                                }
+                                            }
+                                        }
+                                        $fullProduct = Mage::getModel('catalog/product')->load($product->getId()); // please don't do this :-)
+                                            $totalPrice = $basePrice;
+                                            // check all configurable attributes
+                                            foreach ($attributes as $attribute){
+                                                $value = $fullProduct->getData($attribute->getProductAttribute()->getAttributeCode());
+                                                // if the attribute is used in parent and child, add the previously stored price increase to the simple product price
+                                                if (isset($pricesByAttributeValues[$value])){
+                                                    $totalPrice += $pricesByAttributeValues[$value];
+                                                }
+                                            }
+
+					$product_data_in_configurable['price'] = sprintf('%0.2f',$totalPrice);
+
+                                        $jsondata[] = json_encode($product_data_in_configurable)."\n"; // Add this product data to main json array
+                                    }
                                 }
                             }
 
@@ -185,6 +228,17 @@ class Datalay_FindifyFeed_Model_Cron{
 
 		        // Write product feed array to gzipped file
 		        file_put_contents("compress.zlib://$file", $jsondata);
+
+		        $endtime = new DateTime('NOW');
+                        $runinterval = $starttime->diff($endtime);
+                        $elapsed = $runinterval->format('%S'); // elapsed seconds
+                        $fileurl = $urlmediapath.'/findify/'.$filename.'.gz';
+
+                        $extradata['feeds'][$storeCode] = array(
+				'feed_url' => $fileurl,
+				'last_generation_duration' => $elapsed,
+				'last_generation_time' => $starttime
+			);
 
     	            }else{ // feed is not enabled
 		        Mage::log('Findify: feed generation for store '.$storeCode.' is disabled in system configuration');
@@ -195,6 +249,9 @@ class Datalay_FindifyFeed_Model_Cron{
                 } // end foreach ($allStores)
 	    } // end foreach ($website->getGroups()
         } // end foreach (Mage::app()->getWebsites()
+
+	$jsonextradata[] = json_encode($extradata);
+	file_put_contents("compress.zlib://$fileextradata", $jsonextradata);
 
 	Mage::log('Findify: cron task has finished');
 	return $this;
