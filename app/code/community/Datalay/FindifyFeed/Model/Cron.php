@@ -73,7 +73,6 @@ class Datalay_FindifyFeed_Model_Cron{
 			$products = Mage::getResourceModel('catalog/product_collection')
 			    ->addAttributeToFilter('status',array('eq' => Mage_Catalog_Model_Product_Status::STATUS_ENABLED))
 			    ->addAttributeToSelect($attributesUsed);
-			    //->addAttributeToFilter('sku', array('like' => 'm%'))
 
 			// We load all category IDs and names as an array to avoid Mage::getModel('catalog/category')->getCollection() in each loop
 			$categoryIdNames = array();
@@ -115,8 +114,6 @@ class Datalay_FindifyFeed_Model_Cron{
                             $pathArray = array();
                             $productCategories = $product->getCategoryCollection() // this could be faster in big catalogs if we store id - path as an array previously
                                     ->addAttributeToSelect('path');
-                                    //->addAttributeToSelect('is_active')
-                                    //->setStoreId($storeId)
                             foreach($productCategories as $category){            
                                 $pathIds = explode('/', $category->getPath()); // getPath() returns category IDs path as '1/2/53', we store that as an array ['1','2','53']
                                 $pathByName = array();
@@ -206,17 +203,19 @@ class Datalay_FindifyFeed_Model_Cron{
                                                 }
                                             }
                                         }
-                                        $fullProduct = Mage::getModel('catalog/product')->load($product->getId()); // please don't do this :-)
-                                            $totalPrice = $basePrice;
-                                            // check all configurable attributes
-                                            foreach ($attributes as $attribute){
-                                                $value = $fullProduct->getData($attribute->getProductAttribute()->getAttributeCode());
-                                                // if the attribute is used in parent and child, add the previously stored price increase to the simple product price
-                                                if (isset($pricesByAttributeValues[$value])){
-                                                    $totalPrice += $pricesByAttributeValues[$value];
-                                                }
+                                        $fullProduct = Mage::getModel('catalog/product')->load($product->getId()); // Loading products in a loop is generally not recommended because it is resource intensive, but it is the only way to get full product attributes in all possible configurations here
+                                        $totalPrice = $basePrice;
+                                        // check all configurable attributes
+                                        foreach ($attributes as $attribute){
+                                            $attributeCode = $attribute->getProductAttribute()->getAttributeCode(); // 'color', 'size', etc
+                                            $attributeValue = $fullProduct->getData($attributeCode);
+                                            // if the attribute is used in parent and child, add the previously stored price increase to the simple product price
+                                            if (isset($pricesByAttributeValues[$attributeValue])){
+                                                $totalPrice += $pricesByAttributeValues[$attributeValue];
+                                                $attributecontent = $fullProduct->getAttributeText($attributeCode);
+                                                $product_data_in_configurable['configurable_attributes'][$attributeCode] = $attributecontent; // json data 'configurable_attributes' shows attribute and content for each configurable product's child
                                             }
-
+                                        }
 					$product_data_in_configurable['price'] = sprintf('%0.2f',$totalPrice);
 
                                         $jsondata[] = json_encode($product_data_in_configurable)."\n"; // Add this product data to main json array
