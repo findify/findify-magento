@@ -213,7 +213,7 @@ class Datalay_FindifyFeed_Model_Cron{
                                             if (isset($pricesByAttributeValues[$attributeValue])){
                                                 $totalPrice += $pricesByAttributeValues[$attributeValue];
                                                 $attributecontent = $fullProduct->getAttributeText($attributeCode);
-                                                $product_data_in_configurable['configurable_attributes'][$attributeCode] = $attributecontent; // json data 'configurable_attributes' shows attribute and content for each configurable product's child
+                                                $product_data_in_configurable['cf_'.$attributeCode] = $attributecontent; // attribute and content for each configurable product's child
                                             }
                                         }
 					$product_data_in_configurable['price'] = sprintf('%0.2f',$totalPrice);
