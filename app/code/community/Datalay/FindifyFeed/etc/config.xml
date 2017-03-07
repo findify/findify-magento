@@ -2,7 +2,7 @@
 <config>
     <modules>
         <Datalay_FindifyFeed>
-            <version>1.0.2</version>
+            <version>1.0.3</version>
         </Datalay_FindifyFeed>
     </modules>
     <global>
@@ -80,6 +80,15 @@
             </adminhtml>
         </routers>
     </admin>
+    <frontend>
+	<layout>  
+            <updates>
+                <findifyfeed>
+		    <file>datalay_findifyfeed.xml</file>
+                </findifyfeed>
+            </updates>
+        </layout>
+    </frontend>
     <!-- <adminhtml>
         <layout>
                 <updates>
