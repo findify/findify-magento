@@ -11,7 +11,7 @@ $cmsPageData = array(
     'content_heading' => '',
     'is_active' => 1,
     'stores' => array(0),//available for all store views
-    'content' => "<div data-findify-attr="findify-search-results"></div>"
+    'content' => "<div data-findify-attr=\"findify-search-results\"></div>"
 );
 
 $pageAlreadyExists = 0;
@@ -31,9 +31,8 @@ foreach (Mage::app()->getWebsites() as $website) {
 }
 
 if (!$pageAlreadyExists){
-// if we have found no page with this identifier, we cat create it
+// if we have found no page with this identifier, we create it
     Mage::getModel('cms/page')->setData($cmsPageData)->save();
 }                               
 
 $installer->endSetup();
-	 

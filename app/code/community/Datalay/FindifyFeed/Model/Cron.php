@@ -212,8 +212,8 @@ class Datalay_FindifyFeed_Model_Cron{
                                             // if the attribute is used in parent and child, add the previously stored price increase to the simple product price
                                             if (isset($pricesByAttributeValues[$attributeValue])){
                                                 $totalPrice += $pricesByAttributeValues[$attributeValue];
-                                                $attributecontent = $fullProduct->getAttributeText($attributeCode);
-                                                $product_data_in_configurable['cf_'.$attributeCode] = $attributecontent; // attribute and content for each configurable product's child
+                                                // $attributecontent = $fullProduct->getAttributeText($attributeCode);
+                                                // $product_data_in_configurable['cf_'.$attributeCode] = $attributecontent; // attribute and content for each configurable product's child
                                             }
                                         }
 					$product_data_in_configurable['price'] = sprintf('%0.2f',$totalPrice);

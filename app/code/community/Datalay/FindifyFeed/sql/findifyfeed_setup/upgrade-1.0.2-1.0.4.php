@@ -31,9 +31,8 @@ foreach (Mage::app()->getWebsites() as $website) {
 }
 
 if (!$pageAlreadyExists){
-// if we have found no page with this identifier, we cat create it
+// if we have found no page with this identifier, we create it
     Mage::getModel('cms/page')->setData($cmsPageData)->save();
 }                               
 
 $installer->endSetup();
-	 
