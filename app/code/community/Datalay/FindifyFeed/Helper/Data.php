@@ -88,6 +88,14 @@ class Datalay_FindifyFeed_Helper_Data extends Mage_Core_Helper_Abstract
     
     }
     
+    public function getJSTag()
+    {
+        $storeId = Mage::app()->getStore()->getStoreId();
+        $findifyJsTag = Mage::getStoreConfig('attributes/analytics/jstag',$storeId);
+        $findifyJsTagWrapped = "<script type=\"text/javascript\" src=\"".$findifyJsTag."\"></script>"; // Value is returned from helper so we do not need CDATA enclosing here
+        return $findifyJsTagWrapped;
+    }
+    
 
 }
 	 
