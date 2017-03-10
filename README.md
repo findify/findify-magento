@@ -63,4 +63,7 @@ Each view contains:
 
 ![feed_info](doc/feed_info.png)
 
+## Insert the Javascript link
+At the end of the onboarding with Findify, an URL to a Javascript file will be given to you. You need to copy this link and paste it in the "JS Integration" block. Click on the checkbox "Enabled", so the extension is inserting this JS link in your Magento view.
 
+![javascript_link](doc/js_link.png)
