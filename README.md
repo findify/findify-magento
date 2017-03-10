@@ -67,3 +67,10 @@ Each view contains:
 At the end of the onboarding with Findify, an URL to a Javascript file will be given to you. You need to copy this link and paste it in the "JS Integration" block. Click on the checkbox "Enabled", so the extension is inserting this JS link in your Magento view.
 
 ![javascript_link](doc/js_link.png)
+
+## Developers information
+- The extension is creating a CMS Page called “Search” to show the search results. If you already have one with the same name, this CMS Page will not be created. You can then choose between renaming yours before you install the extension, or just add this HTML code to your CMS Page: 
+```html
+<div data-findify-attr="findify-search-results"></div>
+```
+- If you would like to make some modifications to the design of the Findify search results, you would need to go to your Findify Merchant Dashboard, section "My Search" > "Style".
