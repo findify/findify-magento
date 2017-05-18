@@ -11,6 +11,9 @@
         <reference name="header">
             <block type="core/template" name="top.search" as="topSearch" template="datalay_findify/form.mini.phtml"/>
         </reference>
+        <reference name="content">
+            <block type="core/template" name="findify_tracking_code_cart" template="datalay_findify/checkout_cart.phtml" after="-"></block>
+        </reference>
     </default>
 
     <catalog_product_view>
@@ -24,5 +27,12 @@
             <block type="core/template" name="findify_tracking_code_success" template="datalay_findify/checkout_success.phtml" after="-"></block>
         </reference>
     </checkout_onepage_success>
+
+<!--    <checkout_cart_index>
+        <reference name="content">
+            <block type="core/template" name="findify_tracking_code_cart" template="datalay_findify/checkout_cart.phtml" after="-"></block>
+        </reference>
+    </checkout_cart_index>
+-->
 
 </layout>
