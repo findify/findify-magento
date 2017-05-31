@@ -1,7 +1,7 @@
 <?php $product = Mage::registry('current_product'); ?>
-<?php if($product && $product->getId()) : ?>
- <?php
-   if($product->getTypeId() == "simple"){
+<?php if($product->getId()) : ?>
+<?php
+   if(false && $product->getTypeId() == "simple"){
          $parentIds = Mage::getModel('catalog/product_type_grouped')->getParentIdsByChild($product->getId());
          if(!$parentIds)
              $parentIds = Mage::getModel('catalog/product_type_configurable')->getParentIdsByChild($product->getId());
@@ -10,8 +10,6 @@
           $pid = $parent->getId();
         } else $pid = $product->getId();
    } else $pid = $product->getId();
- ?>
-    <div class="findify_page_product" style="display:none;"><?php echo $pid; ?></div>
-
-    <div data-findify-event="view-page" data-findify-item-id="<?php echo $pid; ?>" data-findify-variant-item-id="<?php echo $pid; ?>"></div>
+?>
+    <div data-findify-event="view-page" data-findify-item-id="<?php echo $pid; ?>"></div>
 <?php endif; ?>

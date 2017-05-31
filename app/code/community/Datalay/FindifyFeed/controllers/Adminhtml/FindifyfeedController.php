@@ -22,5 +22,8 @@ class Datalay_FindifyFeed_Adminhtml_FindifyfeedController extends Mage_Adminhtml
        		$result = 1;
         	Mage::app()->getResponse()->setBody($result);
 	}
-		
+
+	protected function _isAllowed() {
+                return Mage::getSingleton('admin/session')->isAllowed('system/config/attributes');
+        }
 }

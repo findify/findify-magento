@@ -2,6 +2,9 @@
 <layout version="0.1.0">
     <default>
         <reference name="head">
+	    <!-- <block type="core/text" name="polyfilljs">
+                <action method="setText"><text><![CDATA[<script src="//cdnjs.cloudflare.com/ajax/libs/babel-polyfill/6.23.0/polyfill.min.js"></script>]]></text></action>
+            </block> -->
             <block type="core/text" name="findifyjstag">
                 <action method="setText" ifconfig="attributes/analytics/isenabled">
                     <text helper="findifyfeed/getJSTag" />
@@ -27,12 +30,9 @@
             <block type="core/template" name="findify_tracking_code_success" template="datalay_findify/checkout_success.phtml" after="-"></block>
         </reference>
     </checkout_onepage_success>
-
 <!--    <checkout_cart_index>
         <reference name="content">
             <block type="core/template" name="findify_tracking_code_cart" template="datalay_findify/checkout_cart.phtml" after="-"></block>
         </reference>
-    </checkout_cart_index>
--->
-
+    </checkout_cart_index> -->
 </layout>

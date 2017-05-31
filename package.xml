@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<package>
+    <name>findify</name>
+    <version>1.0.5</version>
+    <stability>stable</stability>
+    <license>MITL</license>
+    <channel>community</channel>
+    <extends/>
+    <summary>The Findify extension allows you to generate a product feed containing all enabled products of your Magento store view.</summary>
+    <description>The Findify extension allows you to generate a product feed containing all enabled products of your Magento store view. For a multi-language or a multi-sites store, a distinct feed can be generated for each store view.&#xD;
+&#xD;
+The main features of this extension are:&#xD;
+&#xD;
+Schedule the generation of the feeds&#xD;
+Configure the attributes of the feeds&#xD;
+Magento compatible versions: 1.5, 1.6, 1.6.1, 1.6.2.0, 1.7, 1.8, 1.8.1, 1.9, 1.9.1, 1.9.2, 1.9.3&#xD;
+&#xD;
+Please visit Github repository for full changelog and documentation:&#xD;
+&#xD;
+https://github.com/findify/findify-magento&#xD;
+</description>
+    <notes>First Release in Magento Connect. Please visit Github repository for full changelog and documentation:&#xD;
+&#xD;
+https://github.com/findify/findify-magento&#xD;
+</notes>
+    <authors><author><name>Thomas Fattal</name><user>findify</user><email>thomas@findify.io</email></author><author><name>Fernando Sanchez</name><user>fersanchez</user><email>fersanchez@gmail.com</email></author></authors>
+    <date>2017-05-31</date>
+    <time>20:05:29</time>
+    <contents><target name="magecommunity"><dir name="Datalay"><dir name="FindifyFeed"><dir name="Block"><dir name="Adminhtml"><file name="Feeddate.php" hash="8e93264f821df5256eaa4fafed7292b0"/><file name="Feedisrunning.php" hash="a23f43e7f2cea7a103118fb9e52765d9"/><file name="Feedurl.php" hash="f39788a2018bb4581a140cdc5ce76aa0"/><file name="Findifymodel.php" hash="65d7ba71996a6d825a715f48e9d8688d"/><dir name="Page"><file name="Head.php" hash="0a11b1a5c084028cedad14ac5f29809d"/></dir></dir><dir name="Config"><dir name="Adminhtml"><dir name="Form"><dir name="Field"><file name="Attribute.php" hash="be28d63ccd479c29cfed613551dc8963"/></dir></dir></dir><file name="SelectAttributes.php" hash="2a2e1932a5227a60bd7f5c237b079a27"/></dir><file name="Generatenow.php" hash="bd01d0e611d1961343e29b880c552bfc"/><dir name="Html"><file name="Head.php" hash="1a9414e9559e83813265e8df3cea0e61"/></dir></dir><dir name="Helper"><file name="Data.php" hash="d5b7c0b8515d93cc48b5d51056a9cb83"/></dir><dir name="Model"><dir name="Adminhtml"><dir name="System"><dir name="Config"><dir name="Backend"><dir name="Findifymodel"><file name="Cron.php" hash="59cf5195600d16085db0f73f848a8db1"/></dir></dir></dir></dir></dir><file name="Cron.php" hash="7bc02110dcebfa5cbeb0e1f10900fea1"/><file name="Findifymodel.php" hash="e2cb90a55cb5483caed5fcbccbc66f7f"/><file name="Observer.php" hash="7d46a675f1a1f329422ef180a9830123"/></dir><dir name="controllers"><dir name="Adminhtml"><file name="FindifyfeedController.php" hash="d3e34a8ba74f1b64b0dbb5b22ece6c17"/></dir></dir><dir name="etc"><file name="adminhtml.xml" hash="f33bba9d97d440e76df3d279cf809030"/><file name="config.xml" hash="bd1a86896493aff28a98426c0102f119"/><file name="system.xml" hash="acbb1d7bf667afbca38b7847e7f1daea"/></dir><dir name="sql"><dir name="findifyfeed_setup"><file name="install-1.0.5.php" hash="22adfed02aa47209339f0691e2478a2e"/><file name="upgrade-1.0.0-1.0.5.php" hash="22adfed02aa47209339f0691e2478a2e"/><file name="upgrade-1.0.1-1.0.5.php" hash="22adfed02aa47209339f0691e2478a2e"/><file name="upgrade-1.0.2-1.0.5.php" hash="22adfed02aa47209339f0691e2478a2e"/></dir></dir></dir></dir></target><target name="magedesign"><dir name="adminhtml"><dir name="default"><dir name="default"><dir name="template"><dir name="datalay"><dir name="system"><dir name="config"><file name="button.phtml" hash="c057eb52dcbde1d2a8439387707deef3"/></dir></dir></dir></dir></dir></dir></dir><dir name="frontend"><dir name="base"><dir name="default"><dir name="layout"><file name="datalay_findifyfeed.xml" hash="c2e1607a01e864c33cff7310ab725d1c"/></dir><dir name="template"><dir name="datalay_findify"><file name="checkout_cart.phtml" hash="00708b38df787b4a38280e9789726f77"/><file name="checkout_success.phtml" hash="d126c684a434c6ba9618bc04bcf804d1"/><file name="form.mini.phtml" hash="b83d8e0fc0f4646f5ca8c233d01910c1"/><file name="product_view.phtml" hash="29a29b63fdb11aceae6ee07eaedfc0da"/></dir></dir></dir></dir></dir></target><target name="mageetc"><dir name="modules"><file name="Datalay_FindifyFeed.xml" hash="b289199acca7dc4354cfaf65d8774a47"/></dir></target><target name="magemedia"><dir name="."><file name="findify" hash="d41d8cd98f00b204e9800998ecf8427e"/></dir></target></contents>
+    <compatible/>
+    <dependencies><required><php><min>5.3.0</min><max>7.1.0</max></php><extension><name>json</name><min/><max/></extension></required></dependencies>
+</package>

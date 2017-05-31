@@ -2,7 +2,7 @@
 <config>
     <modules>
         <Datalay_FindifyFeed>
-            <version>1.0.4</version>
+            <version>1.0.5</version>
         </Datalay_FindifyFeed>
     </modules>
     <global>
@@ -15,6 +15,16 @@
             <findifyfeed>
                 <class>Datalay_FindifyFeed_Block</class>
             </findifyfeed>
+            <page>
+                <rewrite>
+                    <html_head>Datalay_FindifyFeed_Block_Html_Head</html_head>
+                </rewrite>
+            </page>
+            <adminhtml>
+                <rewrite>
+                    <page_head>Datalay_FindifyFeed_Block_Adminhtml_Page_Head</page_head>
+                </rewrite>
+            </adminhtml>
         </blocks>
         <models>
             <findifyfeed>
@@ -41,6 +51,17 @@
                 </observers>
             </findifyfeed_notifications_before>
         </events> -->
+        <events>
+            <core_block_abstract_prepare_layout_before>
+                <observers>
+                    <findifyfeed_prepare_layout_before>
+			<type>Model</type>
+                        <class>findifyfeed/observer</class>
+                        <method>prepareLayoutBefore</method>
+                    </findifyfeed_prepare_layout_before>
+                </observers>
+            </core_block_abstract_prepare_layout_before>
+        </events>
         <resources>
             <findifyfeed_setup>
                 <setup>
