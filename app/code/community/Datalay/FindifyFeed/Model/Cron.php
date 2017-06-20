@@ -175,6 +175,10 @@ class Datalay_FindifyFeed_Model_Cron{
                                 $groupParentsIds = Mage::getModel('catalog/product_type_grouped')->getParentIdsByChild($product->getId()); // does it belong to a grouped product?
                                 if(isset($groupParentsIds[0])){ // it belongs to at least one grouped product
                                     foreach($groupParentsIds as $parentId) {
+                                        $groupedProduct = Mage::getModel('catalog/product')->load($parentId);
+                                        if($groupedProduct->getStatus() != Mage_Catalog_Model_Product_Status::STATUS_ENABLED){
+                                            continue; // if grouped product is disabled, we do not add it to the feed
+                                        } 
                                         $product_data_in_group = $product_data; // we add to the feed a copy of the simple product for each group that it belongs to, modifying item_group_id in each instance
                                         $product_data_in_group['item_group_id'] = $parentId;
                                         $jsondata[] = json_encode($product_data_in_group)."\n";
@@ -184,11 +188,14 @@ class Datalay_FindifyFeed_Model_Cron{
                                 $configurableParentsIds = Mage::getModel('catalog/product_type_configurable')->getParentIdsByChild($product->getId()); // does it belong to a configurable product?
                                 if(isset($configurableParentsIds[0])){ // it belongs to at least one configurable product
                                     foreach($configurableParentsIds as $parentId) {
+                                        $configurableProduct = Mage::getModel('catalog/product')->load($parentId); 
+                                        if($configurableProduct->getStatus() != Mage_Catalog_Model_Product_Status::STATUS_ENABLED){
+                                                continue; // if configurable product is disabled, we do not add it to the feed
+                                        } 
                                         $product_data_in_configurable = $product_data; // we add to the feed a copy of the simple product for each configurable that it belongs to, modifying item_group_id in each instance
                                         $product_data_in_configurable['item_group_id'] = $parentId; // child products are added once for each parent, setting item_group_id with the parents' ids
 
 					// now we will calculate the product's price as part of its configurable parent
-                                        $configurableProduct = Mage::getModel('catalog/product')->load($parentId); 
                                         $attributes = $configurableProduct->getTypeInstance(true)->getConfigurableAttributes($configurableProduct);
                                         $pricesByAttributeValues = array();
                                         $basePrice = $configurableProduct->getFinalPrice(); // configurable product base price
