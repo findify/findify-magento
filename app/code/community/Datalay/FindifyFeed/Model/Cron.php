@@ -80,8 +80,12 @@ class Datalay_FindifyFeed_Model_Cron{
                         }
 
                         foreach ($_product_type_filters as $_type_filter) {
+							
+							/* for bundle products */
+			    			if($_type_filter["in"])
+								$attributesUsed[] = "price_type";
 
-                            // load product collection, selecting only needed attributes
+							// load product collection, selecting only needed attributes
                             $products = Mage::getResourceModel('catalog/product_collection')
                                 ->addAttributeToFilter('status',array('eq' => Mage_Catalog_Model_Product_Status::STATUS_ENABLED))
                                     ->addAttributeToSelect($attributesUsed)
