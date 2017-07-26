@@ -167,7 +167,13 @@ class Datalay_FindifyFeed_Model_Cron
                                     $specialPriceFromDate = $product->getSpecialFromDate();
                                     $specialPriceToDate = $product->getSpecialToDate();
                                     if (Mage::app()->getLocale()->isStoreDateInInterval($product->getStoreId(), $specialPriceFromDate, $specialPriceToDate)) {
-                                        $product_data['sale_price'] = sprintf('%0.2f',$specialprice);
+                                        //$product_data['sale_price'] = sprintf('%0.2f',$specialprice);
+                                        if($product_data["type_id"]=="bundle"){
+					                        $product_data['price'] = sprintf('%0.2f',$_bundle_min_price/$specialprice*100);
+					                        $product_data['sale_price'] = sprintf('%0.2f',$_bundle_min_price);
+					                    }else {
+					                        $product_data['sale_price'] = sprintf('%0.2f',$specialprice);
+					                    }
                                     }
                                 }          
 
