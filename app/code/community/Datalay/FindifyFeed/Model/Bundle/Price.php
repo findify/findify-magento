@@ -150,7 +150,15 @@ class Datalay_FindifyFeed_Model_Bundle_Price extends Mage_Bundle_Model_Product_P
             $selectionUnitPrice = $this->getSelectionFinalTotalPrice(
                 $product, $selection, 1, null, false, $takeTierPrice);
             $selectionQty = $selection->getSelectionQty();
-            if ($isPriceFixedType || $taxCalcMethod == Mage_Tax_Model_Calculation::CALC_TOTAL_BASE) {
+            /* min price for option selection */
+            if ($isPriceFixedType) {
+                $selectionPrice = $selectionQty * $taxHelper->getPrice($item, $selectionUnitPrice, $includeTax, null, null, null, null, null, false);
+                if(isset($selectionPrices[$item->getId()])){
+                    $selectionPrices[$item->getId()] = min(  $selectionPrice , $selectionPrices[$item->getId()] );
+                }else{
+                    $selectionPrices[$item->getId()] = $selectionPrice;
+                }
+            } else if ($taxCalcMethod == Mage_Tax_Model_Calculation::CALC_TOTAL_BASE) {
                 $selectionPrice = $selectionQty * $taxHelper->getPrice($item, $selectionUnitPrice, $includeTax, null, null, null, null, null, false);
                 $selectionPrices[$item->getId()] = $selectionPrice;
             } else if ($taxCalcMethod == Mage_Tax_Model_Calculation::CALC_ROW_BASE) {
