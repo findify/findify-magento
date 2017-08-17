@@ -92,6 +92,7 @@ class Datalay_FindifyFeed_Model_Cron
                             $products = Mage::getResourceModel('catalog/product_collection')
                                 ->addAttributeToFilter('status',array('eq' => Mage_Catalog_Model_Product_Status::STATUS_ENABLED))
                                 ->addAttributeToSelect($attributesUsed)
+				->addStoreFilter($eachStore)
                                 ->addAttributeToFilter('type_id', $_type_filter);
                                 /* process products with children first */
 
