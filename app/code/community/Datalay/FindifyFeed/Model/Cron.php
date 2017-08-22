@@ -228,7 +228,7 @@ class Datalay_FindifyFeed_Model_Cron
                                     $configurableParentsIds = Mage::getModel('catalog/product_type_configurable')->getParentIdsByChild($product->getId()); // does it belong to a configurable product?
                                     if (isset($configurableParentsIds[0])) { // it belongs to at least one configurable product
                                         foreach ($configurableParentsIds as $parentId) {
-                                            $configurableProduct = Mage::getModel('catalog/product')->load($parentId); 
+                                            $configurableProduct = Mage::getModel('catalog/product')->setStoreId($eachStore)->load($parentId); /* load by store */
                                             if ($configurableProduct->getStatus() != Mage_Catalog_Model_Product_Status::STATUS_ENABLED) {
                                                     continue; // if configurable product is disabled, we do not add it to the feed
                                             }
