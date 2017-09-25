@@ -2,6 +2,8 @@
 class Datalay_FindifyFeed_Model_Cron
 {   
     protected $_bundle_children = array();
+	protected $_grouped_children = array();
+    protected $_configurable_children = array();
     public function cronGenerateFeed()
     {
         Mage::log('Findify: starting cron task');
@@ -157,6 +159,26 @@ class Datalay_FindifyFeed_Model_Cron
                                         $this->_bundle_children[$_child_id][] = $product_data['id'];
                                     }
                                     $product_data['price'] = sprintf('%0.2f',$_bundle_min_price); // price excl tax, two decimal places                                
+                                }elseif($product_data['type_id']=="grouped"){
+                                    $_min_price_info = Mage::getModel('findifyfeed/grouped_price')->getPriceInfo($product);
+                                    $_bundle_min_price = $_min_price_info["price"];
+
+                                    foreach($_min_price_info["products"] as $_child_id ){
+                                        $this->_grouped_children[$_child_id][] = $product_data['id'];
+                                    }
+                                    $product_data['price'] = sprintf('%0.2f',$_bundle_min_price); // price excl tax, two decimal places                                
+                                }elseif($product_data['type_id']=="configurable"){
+                                    
+                                    $_children_price_info = Mage::getModel('findifyfeed/configurable_price')
+                                        ->setProduct($product)
+                                        ->getPriceInfo($eachStore);
+                                    
+                                    foreach($_children_price_info as $_child_id => $_price){
+                                        $this->_configurable_children[$_child_id][$product_data['id']] = $_price;
+                                    }
+                                    
+                                    $product_data['price'] = sprintf('%0.2f',$product->getPrice()); // price excl tax, two decimal places
+                                
                                 } else {
                                     $product_data['price'] = sprintf('%0.2f',$product->getPrice()); // price excl tax, two decimal places
                                 }
@@ -212,61 +234,28 @@ class Datalay_FindifyFeed_Model_Cron
 
                                 if ($product->getTypeId() == "simple") { // if product is not simple, it can not have parents
 
-                                    $groupParentsIds = Mage::getModel('catalog/product_type_grouped')->getParentIdsByChild($product->getId()); // does it belong to a grouped product?
-                                    if (isset($groupParentsIds[0])) { // it belongs to at least one grouped product
-                                        foreach ($groupParentsIds as $parentId) {
-                                            $groupedProduct = Mage::getModel('catalog/product')->load($parentId);
-                                            if ($groupedProduct->getStatus() != Mage_Catalog_Model_Product_Status::STATUS_ENABLED) {
-                                                continue; // if grouped product is disabled, we do not add it to the feed
-                                            } 
+
+									if(isset( $this->_grouped_children[$product_data['id']])){ // it belongs to at least one grouped product
+                                        foreach($this->_grouped_children[$product_data['id']] as $parentId) {
+
                                             $product_data_in_group = $product_data; // we add to the feed a copy of the simple product for each group that it belongs to, modifying item_group_id in each instance
-                                            $product_data_in_group['item_group_id'] = $parentId;
-                                            $jsondata[] = json_encode($product_data_in_group)."\n";
+                                            $product_data_in_group['item_group_id'] = $parentId; 
+                                            $jsondata[] = json_encode($product_data_in_group)."\n"; // Add this product data to main json array
                                         }
-                                    }
+                                    }   
+                                    
+                                
+                                    if(isset( $this->_configurable_children[$product_data['id']])){ // it belongs to at least one configurable product
+                                        foreach($this->_configurable_children[$product_data['id']] as $parentId => $price) {
 
-                                    $configurableParentsIds = Mage::getModel('catalog/product_type_configurable')->getParentIdsByChild($product->getId()); // does it belong to a configurable product?
-                                    if (isset($configurableParentsIds[0])) { // it belongs to at least one configurable product
-                                        foreach ($configurableParentsIds as $parentId) {
-                                            $configurableProduct = Mage::getModel('catalog/product')->setStoreId($eachStore)->load($parentId); /* load by store */
-                                            if ($configurableProduct->getStatus() != Mage_Catalog_Model_Product_Status::STATUS_ENABLED) {
-                                                    continue; // if configurable product is disabled, we do not add it to the feed
-                                            }
-                                            $product_data_in_configurable = $product_data; // we add to the feed a copy of the simple product for each configurable that it belongs to, modifying item_group_id in each instance
-                                            $product_data_in_configurable['item_group_id'] = $parentId; // child products are added once for each parent, setting item_group_id with the parents' ids
-
-                                            // now we will calculate the product's price as part of its configurable parent
-                                            $attributes = $configurableProduct->getTypeInstance(true)->getConfigurableAttributes($configurableProduct);
-                                            $pricesByAttributeValues = array();
-                                            $basePrice = $configurableProduct->getFinalPrice(); // configurable product base price
-                                            foreach ($attributes as $attribute){ // check all attributes and get the price adjustments specified in the configurable product admin page
-                                                $prices = $attribute->getPrices();
-                                                foreach ($prices as $price){
-                                                    if ($price['is_percent']) {
-                                                        $pricesByAttributeValues[$price['value_index']] = (float)$price['pricing_value'] * $basePrice / 100;
-                                                    } else {
-                                                        $pricesByAttributeValues[$price['value_index']] = (float)$price['pricing_value'];
-                                                    }
-                                                }
-                                            }
-                                            $fullProduct = Mage::getModel('catalog/product')->load($product->getId()); // Loading products in a loop is generally not recommended because it is resource intensive, but it is the only way to get full product attributes in all possible configurations here
-                                            $totalPrice = $basePrice;
-                                            // check all configurable attributes
-                                            foreach ($attributes as $attribute) {
-                                                $attributeCode = $attribute->getProductAttribute()->getAttributeCode(); // 'color', 'size', etc
-                                                $attributeValue = $fullProduct->getData($attributeCode);
-                                                // if the attribute is used in parent and child, add the previously stored price increase to the simple product price
-                                                if (isset($pricesByAttributeValues[$attributeValue])) {
-                                                    $totalPrice += $pricesByAttributeValues[$attributeValue];
-                                                    // $attributecontent = $fullProduct->getAttributeText($attributeCode);
-                                                    // $product_data_in_configurable['cf_'.$attributeCode] = $attributecontent; // attribute and content for each configurable product's child
-                                                }
-                                            }
-                                            $product_data_in_configurable['price'] = sprintf('%0.2f',$totalPrice);
-
+                                            $product_data_in_configurable = $product_data; // we add to the feed a copy of the simple product for each group that it belongs to, modifying item_group_id in each instance
+                                            $product_data_in_configurable['item_group_id'] = $parentId; 
+                                            $product_data_in_configurable['price'] = sprintf('%0.2f',$price); 
+                                            
                                             $jsondata[] = json_encode($product_data_in_configurable)."\n"; // Add this product data to main json array
                                         }
-                                    }
+                                    }  
+									
                                     if (isset( $this->_bundle_children[$product_data['id']])) { //isset($bundleParentsIds[0])){ // it belongs to at least one configurable product
                                         foreach ($this->_bundle_children[$product_data['id']] as $parentId) {
                                             $product_data_in_group = $product_data; // we add to the feed a copy of the simple product for each group that it belongs to, modifying item_group_id in each instance
