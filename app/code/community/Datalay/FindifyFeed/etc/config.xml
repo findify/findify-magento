@@ -2,7 +2,7 @@
 <config>
     <modules>
         <Datalay_FindifyFeed>
-            <version>1.0.6</version>
+            <version>1.0.7</version>
         </Datalay_FindifyFeed>
     </modules>
     <global>
