@@ -95,7 +95,12 @@ class Datalay_FindifyFeed_Model_Cron
                                 ->addAttributeToFilter('status',array('eq' => Mage_Catalog_Model_Product_Status::STATUS_ENABLED))
                                 ->addAttributeToSelect($attributesUsed)
 				->addStoreFilter($eachStore)
-                                ->addAttributeToFilter('type_id', $_type_filter);
+                                ->addFinalPrice()
+				->addAttributeToFilter('type_id', $_type_filter)
+				->addAttributeToSort('id', 'asc')
+				;
+                                
+
                                 /* process products with children first */
 
                             // We load all category IDs and names as an array to avoid Mage::getModel('catalog/category')->getCollection() in each loop
@@ -152,7 +157,7 @@ class Datalay_FindifyFeed_Model_Cron
                                 $product_data['title'] = $product->getName(); // name
 
                                 if ($product_data['type_id']=="bundle") {
-                                    $_min_price_info = Mage::getModel('findifyfeed/bundle_price')->getTotalPrices($product, false);
+                                    $_min_price_info = Mage::getModel('findifyfeed/bundle_price')->getTotalPrices($product,false, false);
                                     $_bundle_min_price = $_min_price_info["minprice"];
 
                                     foreach ($_min_price_info["products"] as $_child_id) {
@@ -202,7 +207,7 @@ class Datalay_FindifyFeed_Model_Cron
 
                                 // Product availability, as Magento calculates it
                                 $product_data['availability'] = $product->isSaleable() ? "in stock" : "out of stock";
-
+				    
                                 // php CLI php.ini by default sets memory_limit to -1 (unlimited), but a bug in /lib/Varien/Image/Adapter/Gd2.php
                                 // in some Magento releases makes it interpret -1 as an actual value for size comparation, so it calculates that
                                 // any image size is (of course) bigger than -1 and it does not create the resized image we need. As a workaround
@@ -239,7 +244,7 @@ class Datalay_FindifyFeed_Model_Cron
                                         foreach($this->_grouped_children[$product_data['id']] as $parentId) {
 
                                             $product_data_in_group = $product_data; // we add to the feed a copy of the simple product for each group that it belongs to, modifying item_group_id in each instance
-                                            $product_data_in_group['item_group_id'] = $parentId; 
+										  	$product_data_in_group['item_group_id'] = strval($parentId);
                                             $jsondata[] = json_encode($product_data_in_group)."\n"; // Add this product data to main json array
                                         }
                                     }   
@@ -249,18 +254,18 @@ class Datalay_FindifyFeed_Model_Cron
                                         foreach($this->_configurable_children[$product_data['id']] as $parentId => $price) {
 
                                             $product_data_in_configurable = $product_data; // we add to the feed a copy of the simple product for each group that it belongs to, modifying item_group_id in each instance
-                                            $product_data_in_configurable['item_group_id'] = $parentId; 
+											$product_data_in_configurable['item_group_id'] = strval($parentId);
                                             $product_data_in_configurable['price'] = sprintf('%0.2f',$price); 
                                             
                                             $jsondata[] = json_encode($product_data_in_configurable)."\n"; // Add this product data to main json array
                                         }
                                     }  
 									
-                                    if (isset( $this->_bundle_children[$product_data['id']])) { //isset($bundleParentsIds[0])){ // it belongs to at least one configurable product
+                                    if (isset( $this->_bundle_children[$product_data['id']])) { // it belongs to at least one configurable product
                                         foreach ($this->_bundle_children[$product_data['id']] as $parentId) {
-                                            $product_data_in_group = $product_data; // we add to the feed a copy of the simple product for each group that it belongs to, modifying item_group_id in each instance
-                                            $product_data_in_group['item_group_id'] = $parentId; //$this->_bundle_children[$product_data['id']][0];
-                                            $jsondata[] = json_encode($product_data_in_group)."\n"; // Add this product data to main json array
+                                            $product_data_in_bundle = $product_data; // we add to the feed a copy of the simple product for each group that it belongs to, modifying item_group_id in each instance
+                                            $product_data_in_bundle['item_group_id'] = strval($parentId);
+                                            $jsondata[] = json_encode($product_data_in_bundle)."\n";// Add this product data to main json array
                                         }
                                     }                                    
 
@@ -271,8 +276,6 @@ class Datalay_FindifyFeed_Model_Cron
                     } else { // feed is not enabled
                         Mage::log('Findify: feed generation for store '.$storeCode.' is disabled in system configuration');
                     } // end if($feedisenabled)
-
-                    Mage::log('Findify: feed generation for store '.$storeCode.' has finished');
 
                     // Write product feed array to gzipped file
                     file_put_contents("compress.zlib://$file", $jsondata);
@@ -287,6 +290,9 @@ class Datalay_FindifyFeed_Model_Cron
                         'last_generation_duration' => $elapsed,
                         'last_generation_time' => $starttime
                     );
+					
+					Mage::log('Findify: feed generation for store '.$storeCode.' has finished');
+
                 } // end foreach ($allStores)
             } // end foreach ($website->getGroups()
         } // end foreach (Mage::app()->getWebsites()
