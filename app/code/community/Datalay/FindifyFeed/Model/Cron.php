@@ -37,6 +37,11 @@ class Datalay_FindifyFeed_Model_Cron
 
                 $stores = $group->getStores();
                 foreach ($stores as $eachStore) {
+				
+				    /* reinitiate arrays */
+				    $this->_bundle_children = array();
+				    $this->_grouped_children = array();
+		    		$this->_configurable_children = array();
 
                     $storeCode = $eachStore->getCode();
                     $storeId = $eachStore->getId();
@@ -94,13 +99,11 @@ class Datalay_FindifyFeed_Model_Cron
                             $products = Mage::getResourceModel('catalog/product_collection')
                                 ->addAttributeToFilter('status',array('eq' => Mage_Catalog_Model_Product_Status::STATUS_ENABLED))
                                 ->addAttributeToSelect($attributesUsed)
-				->addStoreFilter($eachStore)
+								->addStoreFilter($eachStore)
                                 ->addFinalPrice()
-				->addAttributeToFilter('type_id', $_type_filter)
-				->addAttributeToSort('id', 'asc')
-				;
+								->addAttributeToFilter('type_id', $_type_filter)
+								->addAttributeToSort('id', 'asc');
                                 
-
                                 /* process products with children first */
 
                             // We load all category IDs and names as an array to avoid Mage::getModel('catalog/category')->getCollection() in each loop
