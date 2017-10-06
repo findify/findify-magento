@@ -160,7 +160,7 @@ class Datalay_FindifyFeed_Model_Cron
                                 $product_data['title'] = $product->getName(); // name
 
                                 if ($product_data['type_id']=="bundle") {
-                                    $_min_price_info = Mage::getModel('findifyfeed/bundle_price')->getTotalPrices($product,false, false);
+                                    $_min_price_info = Mage::getModel('findifyfeed/bundle_price')->getTotalPrices($product,true, false);/*include tax*/
                                     $_bundle_min_price = $_min_price_info["minprice"];
 
                                     foreach ($_min_price_info["products"] as $_child_id) {
