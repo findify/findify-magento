@@ -4,10 +4,10 @@ class Datalay_FindifyFeed_Model_Bundle_Price extends Mage_Bundle_Model_Product_P
 {
 
     public function getTotalPrices($product,
-        $includeTax = null,
         $takeTierPrice = true) {
         $this->_isPricesCalculatedByIndex = $product->getData('min_price'); //&& $product->getData('max_price'));
         $taxHelper = $this->_getHelperData('tax');
+        $includeTax = $taxHelper->displayPriceIncludingTax();
 
         if ($this->_isPricesCalculatedByIndex) {
             $minimalPrice = $taxHelper->getPrice($product, $product->getData('min_price'), $includeTax, null, null, null, null, null, false);
