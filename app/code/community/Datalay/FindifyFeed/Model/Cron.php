@@ -55,6 +55,7 @@ class Datalay_FindifyFeed_Model_Cron
                     }
 
                     Mage::app()->setCurrentStore($storeId);
+		    $starttime = new DateTime('NOW');
 
                     // Is feed generation enabled?
                     $feedisenabled = Mage::getStoreConfig('attributes/schedule/isenabled',$storeId);
@@ -68,7 +69,6 @@ class Datalay_FindifyFeed_Model_Cron
                         }
                         $file = $mediapath.'/findify/'.$filename.'.gz';
 
-                        $starttime = new DateTime('NOW');
                         $today = time(); // time() evaluation should go in the product main loop if a feed generation task could last more than one day (i.e: 1 hour task starting at 23:30)
                         $jsondata = array();                            
 
