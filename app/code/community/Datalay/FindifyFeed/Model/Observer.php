@@ -13,4 +13,11 @@ class Datalay_FindifyFeed_Model_Observer extends Varien_Event_Observer
         }
         return $this;
     }
+
+	    
+    public function afterOrderPlace(Varien_Event_Observer $observer){
+        $order = $observer->getEvent()->getOrder();
+        Mage::getModel("findifyfeed/api")->sendOrderData($order);
+    }
+	
 }
