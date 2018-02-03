@@ -2,7 +2,7 @@
 <config>
     <modules>
         <Datalay_FindifyFeed>
-            <version>1.0.7</version>
+            <version>1.0.8</version>
         </Datalay_FindifyFeed>
     </modules>
     <global>
@@ -109,6 +109,27 @@
                 </findifyfeed>
             </updates>
         </layout>
+    	<routers>
+            <findifyfeed>
+                <use>standard</use>
+                <args>
+                    <module>Datalay_FindifyFeed</module>
+                    <frontName>findify</frontName>
+                </args>
+            </findifyfeed>
+        </routers>
+        <events>
+            <sales_order_place_after>
+                <observers>
+                    <findifyfeed_after_order_place>
+			<type>Model</type>
+                        <class>findifyfeed/observer</class>
+                        <method>afterOrderPlace</method>
+                    </findifyfeed_after_order_place>
+                </observers>
+            </sales_order_place_after>
+        </events>
+
     </frontend>
     <!-- <adminhtml>
         <layout>
