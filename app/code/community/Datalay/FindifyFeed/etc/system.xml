@@ -169,6 +169,20 @@
                             </depends>
                             <validate>required-entry</validate>
                         </jstag>
+                        <apikey translate="label">
+                            <label>API Key:</label>
+                            <frontend_type>text</frontend_type>
+                            <comment>You can find the API key in your Findify account</comment>
+                            <sort_order>25</sort_order>
+                            <show_in_default>0</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <depends>
+                                <isenabled>1</isenabled>
+                            </depends>
+                            <validate>required-entry</validate>
+                        </apikey>                        
+
                     </fields>
                 </analytics>
             </groups>
