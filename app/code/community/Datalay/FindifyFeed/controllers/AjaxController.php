@@ -16,13 +16,14 @@ class Datalay_FindifyFeed_AjaxController extends Mage_Core_Controller_Front_Acti
 
         $query=   "delete from $tableName where findify_uniq = :findify_uniq "
             . " or findify_visit = :findify_visit or session_id = :session_id; "
-            . "insert into $tableName(findify_uniq, findify_visit, session_id) "
-            . " values(:findify_uniq, :findify_visit,:session_id)";
+            . "insert into $tableName(findify_uniq, findify_visit, session_id, created_time) "
+            . " values(:findify_uniq, :findify_visit, :session_id, :created_time)";
         
         $binds = array(
             'findify_uniq' => $findify_uniq,
             'findify_visit' => $findify_visit,
-            'session_id' => $session_id
+            'session_id' => $session_id,
+	    'created_time' => Mage::getModel('core/date')->gmtDate('Y-m-d H:i:s')
         );
 
         $writeConnection->query($query, $binds);
