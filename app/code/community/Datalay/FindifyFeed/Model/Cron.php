@@ -307,4 +307,18 @@ class Datalay_FindifyFeed_Model_Cron
         return $this;
 
     } // end function cronGenerateFeed()
+	
+    public function clearTrackingData(){
+        /* associate in database */
+        $resource = Mage::getSingleton('core/resource');
+        $writeConnection = $resource->getConnection('core_write');
+	$tableName = $resource->getTableName('findify_session');
+        /* delete where values > 5 days old */
+        $query=   "delete from $tableName WHERE DATEDIFF(NOW(),created_time) > 5";
+        $writeConnection->query($query);
+
+    }
+    
+
+	
 } // end class Datalay_FindifyFeed_Model_Cron
