@@ -157,6 +157,18 @@
                     <model>findifyfeed/cron::cronGenerateFeed</model>
                 </run>
             </findifyfeed_crongeneratefeed>
+	
+            <findifyfeed_cleartrackingdata>
+                <schedule>
+                    <cron_expr>* */6 * * *</cron_expr>
+                </schedule>
+                <run>
+                    <model>findifyfeed/cron::clearTrackingData</model>
+                </run>
+            </findifyfeed_cleartrackingdata>
+
+		
+		
         </jobs>
     </crontab>
 </config>
