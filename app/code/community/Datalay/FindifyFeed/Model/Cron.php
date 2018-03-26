@@ -31,6 +31,24 @@ class Datalay_FindifyFeed_Model_Cron
         
         $jsondata = array();
         
+	/* process data for additional selected attributes */
+	// User selected attributes via System / Configuration:
+	$selectedattributes_is_select = array();
+	$selectedattributes = Mage::getStoreConfig('attributes/general/attributes',$storeId);
+	if ($selectedattributes) {
+		$selectedattributes = unserialize($selectedattributes);
+		if (is_array($selectedattributes)) {
+			// User selected attributes via System / Configuration:
+			foreach ($selectedattributes as $selectedattributesRow) {
+				$attrname = $selectedattributesRow['attributename'];
+				$attribute = Mage::getModel('eav/entity_attribute')->loadByCode( Mage_Catalog_Model_Product::ENTITY, $attrname );
+				if($attribute &&   in_array($attribute->getFrontendInput() , array('select', 'multiselect', 'boolean') )  ){
+					$selectedattributes_is_select[] = $attrname;
+				}
+			}
+		}
+	}		
+	    
         foreach (Mage::app()->getWebsites() as $website) {
 
             foreach ($website->getGroups() as $group) {
@@ -75,18 +93,12 @@ class Datalay_FindifyFeed_Model_Cron
                         // Basic attributes which will always be needed for feed generation:
                         $attributesUsed = array('thumbnail','sku','id','visibility','type_id','created_at','news_from_date','name','price','product_url','special_price','special_from_date','special_to_date','description','short_description');
 
-                        // User selected attributes via System / Configuration:
-                        $selectedattributes = Mage::getStoreConfig('attributes/general/attributes',$storeId);
-                        
                         // Add user selected attributes to array of used attributes for select in collection
-                        if ($selectedattributes) {
-                            $selectedattributes = unserialize($selectedattributes);
-                            if (is_array($selectedattributes)) {
-                                foreach ($selectedattributes as $selectedattributesRow) {
-                                    $attributesUsed[] = $selectedattributesRow['attributename'];
-                                }
-                            }
-                        }
+			if (is_array($selectedattributes)) {
+			    foreach ($selectedattributes as $selectedattributesRow) {
+			    	$attributesUsed[] = $selectedattributesRow['attributename'];
+			    }
+		    	}
 
                         foreach ($_product_type_filters as $_type_filter) {
                             
@@ -227,14 +239,16 @@ class Datalay_FindifyFeed_Model_Cron
                                 // User selected attributes via System / Configuration:
                                 if (is_array($selectedattributes)) {
                                     foreach ($selectedattributes as $selectedattributesRow) {
-                                        $attrfilelabel = $selectedattributesRow['attributejson'];
                                         $attrname = $selectedattributesRow['attributename'];
-                                        $attributecontent = $product->getAttributeText($attrname);
-                                        if (!empty($attributecontent)) {
-                                          $product_data[$attrfilelabel] = $attributecontent;
-                                        } else {
-                                          $product_data[$attrfilelabel] = '';
-                                        }
+					if ($product->getData($attrname) !== null){
+						$attrfilelabel = $selectedattributesRow['attributejson'];
+						/* display selected option label for select attributes */
+						if( in_array($attrname, $selectedattributes_is_select)){
+							$product_data[$attrfilelabel] = $product->getAttributeText($attrname);
+						}else{
+							$product_data[$attrfilelabel] = $product->getData($attrname) ;
+						}
+					}
                                     }
                                 }
 
