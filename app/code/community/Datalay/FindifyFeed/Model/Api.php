@@ -77,60 +77,42 @@ class Datalay_FindifyFeed_Model_Api extends Mage_Core_Model_Abstract
         $_data["currency"] = $_order->getOrderCurrencyCode();
         $_data["revenue"] = $_order->getGrandTotal();
 
-        $prodarr = array();
-        $i = 0;
-
+        $_line_items = array();
+        /* add only parent items first */
         foreach ($_order->getAllItems() AS $item){
-            $isconfigurable = 0;
-            $eachProductId = $item->getProductId();
-            $eachProductType = $item->getProductType();
-            $eachProductPrice = $item->getPrice();
-            $eachProductQty = $item->getQtyOrdered();
-            //$pro=Mage::getModel('catalog/product')->load($eachProductId);
-            if ($eachProductType == "simple") {
-                $parentIds = Mage::getModel('catalog/product_type_grouped')->getParentIdsByChild($eachProductId);
-                if (!$parentIds)
-                    $parentIds = Mage::getModel('catalog/product_type_configurable')->getParentIdsByChild($eachProductId);
-                if (isset($parentIds[0]) && $prodarr[$i - 1] && $prodarr[$i - 1]['type'] == "configurable") {
-                    $isconfigurable = 1;
-                    $childId = $eachProductId;
-                    $parent = Mage::getModel('catalog/product')->load($parentIds[0]);
-                    $prid = $parent->getId();
-                } else
-                    $prid = $eachProductId;
-            } else
-                $prid = $eachProductId;
-            $prodarr[$i]['id'] = $prid;
-            $prodarr[$i]['type'] = $eachProductType;
-            $prodarr[$i]['qty'] = $eachProductQty;
-            $prodarr[$i]['price'] = $eachProductPrice;
-            $qty = $eachProductQty;
-            //Mage::log($prodarr[$i]);
-            if ($eachProductType != "configurable") {
-                if ($prodarr[$i - 1] && $prodarr[$i - 1]['type'] == "configurable") {
-                    $pric = $prodarr[$i - 1]['price'];
-                    $prid = $prodarr[$i - 1]['id'];
-                    $qty = $prodarr[$i - 1]['qty'];
-                } else {
-                    $pric = $eachProductPrice;
-                    $qty = $eachProductQty;
-                }
-
-
-                $_item_data = array(
-                    "item_id" => $prid,
-                    "unit_price" => $pric,
-                    "quantity" => $qty
-                );
-
-                if ($isconfigurable) {
-                    $_item_data["variant_item_id"] = $childId;
-                }
-
-                $_data["line_items"][$i] = $_item_data;
+            if(!$item->getParentItemId()){
+                $_line_items[ $item->getId()] = array(
+                    "item_id" => $item->getProductId(),
+                    "unit_price" => $item->getPrice(),
+                    "quantity" => $item->getQtyOrdered()
+                    );
             }
-            $i++;
         }
+
+        /* assign variants for configurable product */
+        foreach ($_order->getAllItems() AS $item){
+            if($item->getParentItemId() && isset($_line_items[ $item->getParentItemId()]) ){
+                /* check if item is configurable */	
+                $_parent = $_order->getItemById( $item->getParentItemId() );
+                if($_parent->getProductType()=="configurable"){
+		    /* add as variant*/
+                    $_line_items[ $item->getParentItemId()]["variant_item_id"] = $item->getProductId();
+                }else{
+			/* add all item data */
+                    $_line_items[ $item->getId()] = array(
+                        "item_id" => $item->getProductId(),
+                        "unit_price" => $item->getPrice(),
+                        "quantity" => $item->getQtyOrdered()
+                    );
+                }
+            }
+        }
+
+        /* add line items to array, remove keys */
+        foreach($_line_items as $_item){
+            $_data["line_items"][] = $_item;
+        }
+	    
         return $_data;
     }
 
