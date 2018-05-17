@@ -78,22 +78,25 @@ class Datalay_FindifyFeed_Model_Api extends Mage_Core_Model_Abstract
         $_data["revenue"] = $_order->getGrandTotal();
 
         $_line_items = array();
+    	$_parent_items = array();
         /* add only parent items first */
-        foreach ($_order->getAllItems() AS $item){
+        foreach ($_order->getAllItems() as $item){
             if(!$item->getParentItemId()){
                 $_line_items[ $item->getId()] = array(
                     "item_id" => $item->getProductId(),
                     "unit_price" => $item->getPrice(),
                     "quantity" => $item->getQtyOrdered()
                     );
+	    	$_parent_items[$item->getId()] = $item;
             }
         }
 
         /* assign variants for configurable product */
-        foreach ($_order->getAllItems() AS $item){
-            if($item->getParentItemId() && isset($_line_items[ $item->getParentItemId()]) ){
+        foreach ($_order->getAllItems() as $item){
+            if($item->getParentItemId() && isset($_line_items[ $item->getParentItemId()])  && isset($_parent_items[ $item->getParentItemId()] ) ){
                 /* check if item is configurable */	
-                $_parent = $_order->getItemById( $item->getParentItemId() );
+                #$_parent = $_order->getItemById( $item->getParentItemId() );
+		$_parent = $_parent_items[ $item->getParentItemId()];
                 if($_parent->getProductType()=="configurable"){
 		    /* add as variant*/
                     $_line_items[ $item->getParentItemId()]["variant_item_id"] = $item->getProductId();
