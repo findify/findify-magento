@@ -1,14 +1,12 @@
 <script type="text/javascript">
-document.observe("dom:loaded", function() {
-    if (typeof(Storage) !== "undefined") {
-        var data = {
-            _findify_uniq : JSON.parse(localStorage._findify_uniq),
-            _findify_visit : JSON.parse(localStorage._findify_visit)
-        };
-        new Ajax.Request('<?php echo $this->getUrl('findify/ajax/refresh');?>', {
-            method: 'get',
-            parameters: data
-        });
-    } 
-});
+(window.findifyCallbacks = window.findifyCallbacks || []).push(function(findify) {
+  var data = {
+    _findify_uniq : findify.analytics.user.uid,
+    _findify_visit : findify.analytics.user.sid
+  };
+  new Ajax.Request('<?php echo $this->getUrl('findify/ajax/refresh');?>', {
+      method: 'get',
+      parameters: data
+  });
+})
 </script>
